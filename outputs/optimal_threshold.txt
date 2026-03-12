@@ -1,0 +1,17 @@
+============================================================
+  OPTIMAL CLASSIFICATION THRESHOLD
+  Method: Youden's J Statistic (J = TPR - FPR)
+============================================================
+
+  Default Threshold:  0.5000
+  Optimal Threshold:  0.052657
+  Youden's J Value:   0.893889
+
+  At Optimal Threshold:
+    True Positive Rate (Sensitivity):  0.955000
+    False Positive Rate:               0.061111
+    Specificity:                       0.938889
+
+  Interpretation:
+    If P(bankruptcy) >= 0.0527, classify as BANKRUPT
+    If P(bankruptcy) <  0.0527, classify as NOT BANKRUPT

@@ -1,0 +1,44 @@
+=================================================================
+  RL STRATEGY EXAMPLE — Best Risk Reduction Path
+  Algorithm: PPO (Proximal Policy Optimization)
+  Environment: FinancialRiskEnv (10-step episodes)
+=================================================================
+
+  Initial Probability: 0.9703 (97.03%)
+
+  Step  1: reduce Liability to Equity
+           → Probability: 0.3702 (37.02%)
+
+  Step  2: reduce Liability to Equity
+           → Probability: 0.1638 (16.38%)
+
+  Step  3: reduce Liability to Equity
+           → Probability: 0.0501 (5.01%)
+
+  Step  4: reduce Liability to Equity
+           → Probability: 0.0139 (1.39%)
+
+  Step  5: reduce Liability to Equity
+           → Probability: 0.0042 (0.42%)
+
+  Step  6: reduce Liability to Equity
+           → Probability: 0.0021 (0.21%)
+
+  Step  7: reduce Liability to Equity
+           → Probability: 0.0018 (0.18%)
+
+  Step  8: reduce Liability to Equity
+           → Probability: 0.0020 (0.20%)
+
+  Step  9: reduce Liability to Equity
+           → Probability: 0.0023 (0.23%)
+
+  Step 10: reduce Liability to Equity
+           → Probability: 0.0011 (0.11%)
+
+  ───────────────────────────────────────────────────────
+  Final Probability: 0.0011 (0.11%)
+  Risk Reduction:    99.9%
+
+  Initial Risk: 🔴 Critical Risk (Score: 97.0)
+  Final Risk:   🟢 Safe (Score: 0.1)

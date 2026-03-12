@@ -1,0 +1,49 @@
+Feature,Importance,Rank,Cumulative
+Persistent EPS in the Last Four Seasons,0.39876935,1,0.39876935
+Cash Flow Per Share,0.10784354,2,0.5066129
+Net Value Per Share (B),0.07895077,3,0.58556366
+Net Value Per Share (C),0.0401697,4,0.6257334
+Revenue Per Share (Yuan ¥),0.0389443,5,0.6646777
+Interest Coverage Ratio (Interest expense to EBIT),0.032851152,6,0.69752884
+Net Value Per Share (A),0.032200545,7,0.7297294
+Operating Profit Per Share (Yuan ¥),0.025850818,8,0.75558025
+Current Ratio,0.013092682,9,0.76867294
+Net worth/Assets,0.012343572,10,0.7810165
+Per Share Net profit before tax (Yuan ¥),0.011669261,11,0.7926858
+Equity to Liability,0.008298934,12,0.80098474
+Operating profit/Paid-in capital,0.007793853,13,0.8087786
+Interest-bearing debt interest rate,0.007585891,14,0.81636447
+Operating Profit Rate,0.0074520363,15,0.8238165
+Operating Gross Margin,0.00738863,16,0.8312051
+Regular Net Profit Growth Rate,0.0072600953,17,0.8384652
+Pre-tax net Interest Rate,0.007076685,18,0.8455419
+Liability to Equity,0.006961452,19,0.85250336
+Total Asset Return Growth Rate Ratio,0.0065617454,20,0.8590651
+After-tax Net Profit Growth Rate,0.006445917,21,0.86551106
+Total debt/Total net worth,0.006385952,22,0.871897
+Net Value Growth Rate,0.0063279727,23,0.87822497
+Borrowing dependency,0.0059145787,24,0.88413954
+Net Income to Stockholder's Equity,0.0058875093,25,0.89002705
+Total Asset Growth Rate,0.005759993,26,0.89578706
+Realized Sales Gross Profit Growth Rate,0.0056590084,27,0.90144604
+ROA(A) before interest and % after tax,0.005439675,28,0.90688574
+Research and development expense rate,0.005360532,29,0.9122463
+Long-term fund suitability ratio (A),0.005332444,30,0.91757876
+Cash flow rate,0.0052773156,31,0.9228561
+Quick Ratio,0.0052284207,32,0.9280845
+Continuous Net Profit Growth Rate,0.0052100644,33,0.93329453
+Operating Expense Rate,0.0051199594,34,0.9384145
+ROA(B) before interest and depreciation after tax,0.005047646,35,0.94346213
+Contingent liabilities/Net worth,0.005022483,36,0.9484846
+ROA(C) before interest and depreciation before interest,0.0049510156,37,0.9534356
+Operating Profit Growth Rate,0.004890339,38,0.9583259
+Cash Reinvestment %,0.00488788,39,0.9632138
+Interest Expense Ratio,0.0048073856,40,0.9680212
+Debt ratio %,0.0047857757,41,0.972807
+Degree of Financial Leverage (DFL),0.0047295275,42,0.9775365
+After-tax net Interest Rate,0.004304319,43,0.9818408
+Non-industry income and expenditure/revenue,0.0041851574,44,0.9860259
+Realized Sales Gross Margin,0.0040645953,45,0.99009055
+Continuous interest rate (after tax),0.003942326,46,0.99403286
+Tax rate (A),0.003491513,47,0.9975244
+Net Income Flag,0.002475629,48,1.0

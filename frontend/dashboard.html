@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Risk Dashboard - FinRisk AI</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fa-solid fa-building-columns"></i>
+            <span>FinRisk AI</span>
+        </div>
+        <div class="nav-links">
+            <a href="index.html">New Analysis</a>
+            <a href="#" class="active">Dashboard</a>
+        </div>
+    </nav>
+
+    <main class="container layout-dashboard" id="dashboard-container" style="display: none;">
+        
+        <!-- SECTION 1: Risk Summary -->
+        <section class="glass-panel card risk-summary-card">
+            <h2>Risk Summary</h2>
+            <div class="risk-score-wrapper">
+                <div class="risk-circle" id="risk-circle">
+                    <span class="score-value" id="risk-score-val">--</span>
+                    <span class="score-label">Risk Score</span>
+                </div>
+                <div class="risk-details">
+                    <h3 id="risk-category-name" class="risk-category">--</h3>
+                    <p>Bankruptcy Probability: <strong id="risk-probability-val">--%</strong></p>
+                    <div class="risk-bar-bg">
+                        <div class="risk-bar-fill" id="risk-bar-fill"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: SHAP Explanation -->
+        <section class="glass-panel card shap-card">
+            <h2><i class="fa-solid fa-scale-balanced"></i> Key Financial Drivers</h2>
+            <div class="chart-container" style="margin-bottom: 2rem;">
+                <canvas id="shap-chart"></canvas>
+            </div>
+            
+            <div id="shap-summary-container" class="rl-summary-card glass-panel" style="padding: 1.5rem; background: rgba(33, 38, 45, 0.4);">
+                <h3 style="margin-bottom: 0.5rem; color: #58a6ff;"><i class="fa-solid fa-bolt"></i> Driver Analysis</h3>
+                <p id="shap-summary-text" style="color: #c9d1d9; font-size: 0.95rem; line-height: 1.5;"></p>
+            </div>
+        </section>
+
+        <!-- SECTION 3: RL Strategy Optimizer -->
+        <section class="glass-panel card rl-strategy-card span-2">
+            <div class="card-header">
+                <h2><i class="fa-solid fa-robot"></i> AI Recommended Financial Strategy</h2>
+                <button id="run-rl-btn" class="btn btn-action">
+                    <i class="fa-solid fa-play"></i> Run Simulation
+                </button>
+            </div>
+            
+            <div id="rl-results" class="rl-results-container" style="display: none;">
+                <div class="rl-stats">
+                    <div class="stat-box">
+                        <span class="stat-label">Initial Risk</span>
+                        <span class="stat-value text-red" id="rl-initial-risk">--%</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label">Projected Final Risk</span>
+                        <span class="stat-value text-green" id="rl-final-risk">--%</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label" id="rl-reduction-label">Risk Reduction</span>
+                        <span class="stat-value" id="rl-reduction">--%</span>
+                    </div>
+                </div>
+                
+                <div class="rl-content-grid">
+                    <div class="rl-steps">
+                        <h3><i class="fa-solid fa-map"></i> Recommended 10-Quarter Strategy</h3>
+                        <div id="rl-strategy-paragraph" class="strategy-paragraph" style="margin-top: 1rem; color: #c9d1d9; font-size: 0.95rem; line-height: 1.6;">
+                            <!-- Paragraph will be populated here -->
+                        </div>
+                    </div>
+                    <div class="rl-chart-wrapper">
+                        <h3>Projected Risk Trajectory</h3>
+                        <canvas id="rl-chart"></canvas>
+                    </div>
+                </div>
+            
+            <div id="rl-summary-container" class="rl-summary-card glass-panel" style="display: none; margin-top: 1.5rem; padding: 1.5rem;">
+                <h3 style="margin-bottom: 0.5rem; color: #58a6ff;"><i class="fa-solid fa-lightbulb"></i> Strategy Summary</h3>
+                <p id="rl-summary-text" style="color: #c9d1d9; font-size: 0.95rem;"></p>
+            </div>
+            
+            <div id="rl-loading" class="rl-loading" style="display: none;">
+                <i class="fa-solid fa-robot fa-bounce"></i>
+                <p>AI Agent is simulating financial adjustment strategies...</p>
+                <small>Training PPO policy on current financial state (may take 10-15s)</small>
+            </div>
+        </section>
+        
+    </main>
+    
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="spinner">
+            <i class="fa-solid fa-circle-notch fa-spin"></i>
+        </div>
+        <h2>Analyzing Financial Data...</h2>
+        <p>Running XGBoost predictions & computing SHAP explanations</p>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            app.initDashboardPage();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Risk Intelligence Platform</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fa-solid fa-building-columns"></i>
+            <span>FinRisk AI</span>
+        </div>
+        <div class="nav-links">
+            <a href="index.html" class="active">New Analysis</a>
+            <a href="#">History</a>
+            <a href="#">Settings</a>
+        </div>
+    </nav>
+
+    <main class="container">
+        <header class="page-header">
+            <h1>Corporate Bankruptcy Risk Simulator</h1>
+            <p>Enter the company's financial indicators to receive a comprehensive risk analysis, SHAP interpretation, and AI-driven reduction strategy.</p>
+        </header>
+
+        <section class="form-card glass-panel">
+            <div class="form-header">
+                <h2>Financial Indicators</h2>
+                <button type="button" id="fill-sample-btn" class="btn btn-secondary">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Fill Demo Data
+                </button>
+            </div>
+            
+            <form id="financial-form">
+                <div id="features-grid" class="features-grid">
+                    <!-- Dynamic form fields will be injected here via JS -->
+                    <div class="loading-spinner">
+                        <i class="fa-solid fa-circle-notch fa-spin"></i> Loading financial indicators...
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" id="analyze-btn" class="btn btn-primary btn-large">
+                        <i class="fa-solid fa-microchip"></i> Analyze Company Risk
+                    </button>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <script src="app.js"></script>
+    <script>
+        // Init index page functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            app.initIndexPage();
+        });
+    </script>
+</body>
+</html>

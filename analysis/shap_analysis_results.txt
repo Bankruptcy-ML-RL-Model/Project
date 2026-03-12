@@ -1,0 +1,133 @@
+# ============================================================================
+#  SHAP ANALYSIS RESULTS — Corporate Bankruptcy Prediction System
+# ============================================================================
+#  Model:      XGBoost Gradient Boosting Classifier
+#  Explainer:  SHAP TreeExplainer
+#  Dataset:    Test Set — 2,000 samples × 48 features
+#  Generated:  2026-03-12
+# ============================================================================
+
+
+# ────────────────────────────────────────────────────────────────────────────
+#  TOP 20 MOST INFLUENTIAL FEATURES (Ranked by Mean |SHAP| Value)
+# ────────────────────────────────────────────────────────────────────────────
+#
+#  Rank | Feature                                       | Mean|SHAP| | Effect Direction
+#  ─────┼───────────────────────────────────────────────┼────────────┼──────────────────
+#    1  | Cash Flow Per Share                           |   0.892148 | Decreases Risk
+#    2  | Persistent EPS in the Last Four Seasons       |   0.841717 | Decreases Risk
+#    3  | Net Value Per Share (C)                       |   0.471029 | Decreases Risk
+#    4  | Net Value Per Share (B)                       |   0.428704 | Decreases Risk
+#    5  | Net worth/Assets                              |   0.422665 | Decreases Risk
+#    6  | Revenue Per Share (Yuan ¥)                    |   0.405614 | Decreases Risk
+#    7  | Total Asset Growth Rate                       |   0.367977 | Decreases Risk
+#    8  | Regular Net Profit Growth Rate                |   0.365875 | Decreases Risk
+#    9  | Operating Gross Margin                        |   0.328562 | Decreases Risk
+#   10  | Liability to Equity                           |   0.302871 | Decreases Risk
+#   11  | Operating Profit Per Share (Yuan ¥)           |   0.284702 | Decreases Risk
+#   12  | Cash flow rate                                |   0.276110 | Decreases Risk
+#   13  | Equity to Liability                           |   0.270258 | Decreases Risk
+#   14  | Pre-tax net Interest Rate                     |   0.263232 | Decreases Risk
+#   15  | After-tax Net Profit Growth Rate              |   0.253014 | Decreases Risk
+#   16  | Net Value Growth Rate                         |   0.249564 | Decreases Risk
+#   17  | Interest Expense Ratio                        |   0.248826 | Decreases Risk
+#   18  | Operating Profit Rate                         |   0.229183 | Decreases Risk
+#   19  | Degree of Financial Leverage (DFL)            |   0.224647 | Decreases Risk
+#   20  | Total Asset Return Growth Rate Ratio          |   0.217924 | Decreases Risk
+
+
+# ────────────────────────────────────────────────────────────────────────────
+#  TOP 5 FEATURES THAT INCREASE BANKRUPTCY RISK
+# ────────────────────────────────────────────────────────────────────────────
+#
+#  These features, when their values change, push the model's prediction
+#  TOWARD bankruptcy (positive SHAP direction):
+#
+#   1. ROA(A) before interest and % after tax        → SHAP: 0.191341
+#   2. After-tax net Interest Rate                   → SHAP: 0.148913
+#   3. Realized Sales Gross Margin                   → SHAP: 0.118617
+#   4. Continuous Net Profit Growth Rate             → SHAP: 0.080375
+#   5. Quick Ratio                                   → SHAP: 0.060193
+
+
+# ────────────────────────────────────────────────────────────────────────────
+#  TOP 5 FEATURES THAT DECREASE BANKRUPTCY RISK
+# ────────────────────────────────────────────────────────────────────────────
+#
+#  These features, when their values are higher, push the model's prediction
+#  AWAY from bankruptcy (negative SHAP direction = safer):
+#
+#   1. Cash Flow Per Share                           → SHAP: 0.892148
+#   2. Persistent EPS in the Last Four Seasons       → SHAP: 0.841717
+#   3. Net Value Per Share (C)                       → SHAP: 0.471029
+#   4. Net Value Per Share (B)                       → SHAP: 0.428704
+#   5. Net worth/Assets                              → SHAP: 0.422665
+
+
+# ────────────────────────────────────────────────────────────────────────────
+#  KEY INTERPRETATIONS
+# ────────────────────────────────────────────────────────────────────────────
+#
+#  1. CASH FLOW IS KING:
+#     Cash Flow Per Share (SHAP: 0.892) is the single most influential
+#     predictor. Companies with strong, positive cash flows are significantly
+#     less likely to go bankrupt. This aligns with financial theory — cash
+#     flow is the lifeblood of any business.
+#
+#  2. CONSISTENT EARNINGS MATTER:
+#     Persistent EPS in the Last Four Seasons (SHAP: 0.842) is the second
+#     most impactful feature. Companies with stable, sustained earnings
+#     over multiple quarters demonstrate resilience against bankruptcy.
+#
+#  3. ASSET VALUE PROVIDES SAFETY:
+#     Net Value Per Share (B & C) and Net worth/Assets all significantly
+#     decrease bankruptcy risk. Companies with strong asset bases relative
+#     to their share count and total assets are better protected.
+#
+#  4. GROWTH SIGNALS HEALTH:
+#     Total Asset Growth Rate and Regular Net Profit Growth Rate both
+#     reduce risk, indicating that growing companies with expanding
+#     profits are less likely to face financial distress.
+#
+#  5. PROFITABILITY RATIOS ARE NUANCED:
+#     While ROA(A) increases risk (counterintuitive — likely capturing
+#     companies with artificially inflated short-term returns before
+#     collapse), operating margins and profit rates decrease risk when
+#     they are genuinely sustainable.
+#
+#  6. LEVERAGE IS A WARNING SIGN:
+#     Liability to Equity and Degree of Financial Leverage appear in
+#     the top 20, confirming that high debt loads relative to equity
+#     increase the probability of financial distress.
+
+
+# ────────────────────────────────────────────────────────────────────────────
+#  SHAP VISUALIZATIONS GENERATED
+# ────────────────────────────────────────────────────────────────────────────
+#
+#  All saved to: outputs/
+#
+#  1. shap_summary_plot.png          — Beeswarm (top 20 features, color=value)
+#  2. shap_feature_importance.png    — Bar chart (mean |SHAP| ranking)
+#  3. shap_waterfall_example.png     — Waterfall (single high-risk company)
+#  4. shap_dependence_plots.png      — 4-panel (Debt ratio%, ROA(A), CashFlow, CurrentRatio)
+#  5. shap_feature_contributions.csv — Full ranked table (all 48 features)
+
+
+# ────────────────────────────────────────────────────────────────────────────
+#  MODEL PERFORMANCE SUMMARY (for reference)
+# ────────────────────────────────────────────────────────────────────────────
+#
+#  TRAINING SET:
+#    Accuracy:   99.99%
+#    Precision:  99.88%
+#    Recall:     100.00%
+#    F1 Score:   99.94%
+#    ROC-AUC:    100.00%
+#
+#  TEST SET:
+#    Accuracy:   96.90%
+#    Precision:  82.55%
+#    Recall:     87.50%
+#    F1 Score:   84.95%
+#    ROC-AUC:    98.72%

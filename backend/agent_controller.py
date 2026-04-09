@@ -82,9 +82,10 @@ If `run_rl_strategy` was called, summarize the steps returned in `recommended_st
 
 class FinancialRiskAgent:
     def __init__(self):
-        # Force-override the environment variable to use the fresh API key provided by the user
-        os.environ["GROQ_API_KEY"] = "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"
-        api_key = os.environ["GROQ_API_KEY"]
+        # Fetch API key securely from environment variables
+        api_key = os.environ.get("GROQ_API_KEY")
+        if not api_key:
+            print("WARNING: GROQ_API_KEY not found in environment variables.")
         self.llm = ChatOpenAI(base_url="https://api.groq.com/openai/v1", model="llama-3.3-70b-versatile", temperature=0, api_key=api_key)
         self.tools = [predict_bankruptcy_risk, generate_shap_explanation, run_rl_strategy]
         self.agent = create_tool_calling_agent(self.llm, self.tools, agent_prompt)

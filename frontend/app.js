@@ -595,13 +595,17 @@ const app = {
             // ── Risk Reduction Bar ──────────────────────────────────
             if (projRisk !== null && projRisk !== undefined && riskScore > 0) {
                 const reductionRow = document.getElementById('advisor-risk-reduction-row');
-                reductionRow.style.display = 'block';
-                const reduction = Math.max(0, riskScore - projRisk);
-                const reductionPct = Math.min(100, (reduction / riskScore) * 100);
-                document.getElementById('advisor-reduction-pct').textContent = reductionPct.toFixed(1) + '% reduction projected';
-                setTimeout(() => {
-                    document.getElementById('advisor-reduction-bar').style.width = reductionPct + '%';
-                }, 100);
+                if (reductionRow) {
+                    reductionRow.style.display = 'block';
+                    const reduction = Math.max(0, riskScore - projRisk);
+                    const reductionPct = Math.min(100, (reduction / riskScore) * 100);
+                    const pctEl = document.getElementById('advisor-reduction-pct');
+                    if (pctEl) pctEl.textContent = reductionPct.toFixed(1) + '% reduction projected';
+                    setTimeout(() => {
+                        const barEl = document.getElementById('advisor-reduction-bar');
+                        if (barEl) barEl.style.width = reductionPct + '%';
+                    }, 100);
+                }
             }
 
             // ── Agent Reasoning Log ─────────────────────────────────

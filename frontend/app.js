@@ -7,7 +7,7 @@ const app = {
     // Default color mapping
     colors: {
         safe: '#3fb950',
-        low: '#58a6ff',
+        low: '#9d4edd',
         mod: '#d29922',
         high: '#f78166',
         crit: '#f85149'
@@ -166,6 +166,11 @@ const app = {
                 app.runRlSimulation(features);
             });
             
+            // Setup Advisor Button
+            document.getElementById('run-advisor-btn').addEventListener('click', () => {
+                app.runAiAdvisor(features);
+            });
+            
         } catch (error) {
             alert('Failed to analyze company risk: ' + error.message);
         }
@@ -228,7 +233,7 @@ const app = {
             c.feature.length > 35 ? c.feature.substring(0, 32) + '...' : c.feature
         );
         const values = combined.map(c => c.value);
-        const bgColors = values.map(v => v > 0 ? '#f85149' : '#58a6ff');
+        const bgColors = values.map(v => v > 0 ? '#f85149' : '#9d4edd');
         
         if (window.shapChartInstance) window.shapChartInstance.destroy();
         
@@ -471,6 +476,155 @@ const app = {
             btn.disabled = false;
             btn.innerHTML = '<i class="fa-solid fa-play"></i> Run Simulation';
             alert('Failed to run RL simulation: ' + error.message);
+        }
+    },
+    
+    // ──────────────────────────────────────────────────────────
+    // AI ADVISOR METHODS
+    // ──────────────────────────────────────────────────────────
+    runAiAdvisor: async (features) => {
+        const btn = document.getElementById('run-advisor-btn');
+        const loading = document.getElementById('advisor-loading');
+        const results = document.getElementById('advisor-results');
+        
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> AI Agent Working...';
+        results.style.display = 'none';
+        loading.style.display = 'block';
+        
+        try {
+            const response = await fetch(`${API_URL}/advisor`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({features})
+            });
+            const data = await response.json();
+            
+            loading.style.display = 'none';
+            results.style.display = 'block';
+            
+            if (data.error) {
+                throw new Error(data.error);
+            }
+            if (data.detail) {
+                // Catches FastAPI HTTPExceptions (like Rate Limits and server crashes)
+                throw new Error(data.detail);
+            }
+
+            const ra = data.company_risk_assessment;
+            const riskScore = ra.risk_score ?? 0;
+            const riskCategory = ra.risk_category ?? 'Unknown';
+            const bankProb = ra.bankruptcy_probability ?? 0;
+            const projRisk = data.projected_risk_after_strategy;
+
+            // ── Banner ──────────────────────────────────────────────
+            const banner = document.getElementById('advisor-banner');
+            const bannerTitle = document.getElementById('advisor-banner-title');
+            const bannerSubtitle = document.getElementById('advisor-banner-subtitle');
+            const bannerIcon = document.getElementById('advisor-banner-icon');
+            
+            const isHighRisk = riskScore >= 50;
+            const isMedRisk = riskScore >= 20 && riskScore < 50;
+            const bannerColor = isHighRisk ? '#f85149' : isMedRisk ? '#ffc400' : '#3fb950';
+            const bannerBg = isHighRisk ? 'rgba(248,81,73,0.08)' : isMedRisk ? 'rgba(255,196,0,0.08)' : 'rgba(63,185,80,0.08)';
+            const bannerBorder = isHighRisk ? 'rgba(248,81,73,0.2)' : isMedRisk ? 'rgba(255,196,0,0.2)' : 'rgba(63,185,80,0.2)';
+            
+            banner.style.background = bannerBg;
+            banner.style.borderBottom = `1px solid ${bannerBorder}`;
+            bannerIcon.textContent = isHighRisk ? '🚨' : isMedRisk ? '⚠️' : '✅';
+            bannerTitle.textContent = isHighRisk ? 'High Bankruptcy Risk Detected — Immediate Action Required' 
+                                    : isMedRisk ? 'Moderate Risk Identified — Strategic Intervention Recommended'
+                                    : 'Company Appears Financially Healthy';
+            bannerTitle.style.color = bannerColor;
+            bannerSubtitle.textContent = `Agent analyzed ${features.length} financial indicators and orchestrated 3 specialized tools to generate this report.`;
+
+            // ── 4 Metric Cards ──────────────────────────────────────
+            const categoryEl = document.getElementById('advisor-risk-category');
+            categoryEl.textContent = riskCategory;
+            categoryEl.style.color = bannerColor;
+
+            const scoreEl = document.getElementById('advisor-risk-score');
+            scoreEl.textContent = riskScore.toFixed(1);
+            scoreEl.style.color = bannerColor;
+
+            const probEl = document.getElementById('advisor-bankruptcy-prob');
+            probEl.textContent = (bankProb * 100).toFixed(1) + '%';
+            probEl.style.color = bannerColor;
+
+            const projEl = document.getElementById('advisor-projected-risk');
+            if (projRisk !== null && projRisk !== undefined) {
+                projEl.textContent = projRisk.toFixed(1);
+            } else {
+                projEl.textContent = 'N/A';
+                projEl.style.color = '#8b949e';
+            }
+
+            // ── Risk Drivers (as chips) ────────────────────────────
+            const driversList = document.getElementById('advisor-drivers-list');
+            driversList.innerHTML = '';
+            const drivers = data.risk_drivers || [];
+            if (drivers.length > 0) {
+                drivers.forEach((driver, idx) => {
+                    const chip = document.createElement('div');
+                    chip.style.cssText = `display: flex; align-items: flex-start; gap: 0.6rem; padding: 0.6rem 0.8rem; background: rgba(248,81,73,0.08); border: 1px solid rgba(248,81,73,0.2); border-radius: 6px; font-size: 0.88rem; color: #c9d1d9; line-height: 1.4;`;
+                    chip.innerHTML = `<span style="color:#f85149; font-weight:700; flex-shrink:0;">⚠️</span><span>${driver.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</span>`;
+                    driversList.appendChild(chip);
+                });
+            } else {
+                driversList.innerHTML = '<div style="color:#8b949e; font-size:0.88rem; font-style:italic;">No significant high-risk drivers identified.</div>';
+            }
+
+            // ── Strategy Steps (numbered timeline) ─────────────────
+            const strategyList = document.getElementById('advisor-strategy-list');
+            strategyList.innerHTML = '';
+            const steps = data.recommended_strategy || [];
+            if (steps.length > 0) {
+                steps.forEach((step, idx) => {
+                    const stepDiv = document.createElement('div');
+                    stepDiv.style.cssText = `display: flex; align-items: flex-start; gap: 0.8rem;`;
+                    stepDiv.innerHTML = `
+                        <div style="min-width: 24px; height: 24px; border-radius: 50%; background: rgba(63,185,80,0.15); border: 1px solid rgba(63,185,80,0.4); color: #3fb950; font-size: 0.75rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px;">${idx + 1}</div>
+                        <div style="font-size: 0.88rem; color: #c9d1d9; line-height: 1.5; padding-top: 0.1rem;">${step.replace(/\*\*(.*?)\*\*/g, '<strong style="color:#eee">$1</strong>')}</div>
+                    `;
+                    strategyList.appendChild(stepDiv);
+                });
+            } else {
+                strategyList.innerHTML = '<div style="color:#8b949e; font-size:0.88rem; font-style:italic;">Company is financially healthy — no corrective actions required.</div>';
+            }
+
+            // ── Risk Reduction Bar ──────────────────────────────────
+            if (projRisk !== null && projRisk !== undefined && riskScore > 0) {
+                const reductionRow = document.getElementById('advisor-risk-reduction-row');
+                reductionRow.style.display = 'block';
+                const reduction = Math.max(0, riskScore - projRisk);
+                const reductionPct = Math.min(100, (reduction / riskScore) * 100);
+                document.getElementById('advisor-reduction-pct').textContent = reductionPct.toFixed(1) + '% reduction projected';
+                setTimeout(() => {
+                    document.getElementById('advisor-reduction-bar').style.width = reductionPct + '%';
+                }, 100);
+            }
+
+            // ── Agent Reasoning Log ─────────────────────────────────
+            const logEl = document.getElementById('advisor-log');
+            const timestamp = new Date().toLocaleTimeString();
+            logEl.textContent = [
+                `[${timestamp}] ▶ Agent initialized with LLaMA3-70B (Groq)`,
+                `[${timestamp}] ▶ Tool 1: predict_bankruptcy_risk → risk_score=${riskScore.toFixed(1)}, category="${riskCategory}"`,
+                riskScore >= 20 ? `[${timestamp}] ▶ Tool 2: generate_shap_explanation → ${drivers.length} drivers identified` : `[${timestamp}] ✓ Risk < 20: SHAP explanation skipped`,
+                riskScore >= 40 ? `[${timestamp}] ▶ Tool 3: run_rl_strategy → projected_risk=${projRisk !== null ? projRisk.toFixed(1) : 'N/A'}` : `[${timestamp}] ✓ Risk < 40: RL strategy skipped`,
+                `[${timestamp}] ▶ Generating final advisory report...`,
+                `[${timestamp}] ✅ Report complete — ${steps.length} strategy steps, ${drivers.length} risk drivers`
+            ].join('\n');
+
+            btn.innerHTML = '<i class="fa-solid fa-check"></i> Report Generated';
+            btn.style.color = '#3fb950';
+            btn.style.borderColor = '#3fb950';
+            
+        } catch (error) {
+            loading.style.display = 'none';
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i>&nbsp; Generate AI Advisory Report';
+            alert('Failed to generate AI Advisory Report: ' + error.message);
         }
     }
 };

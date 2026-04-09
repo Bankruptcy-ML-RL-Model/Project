@@ -2,7 +2,6 @@ import os
 import json
 import re
 from typing import List, Dict, Any
-
 from langchain_openai import ChatOpenAI
 from langchain.agents import AgentExecutor, create_tool_calling_agent
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
@@ -60,15 +59,19 @@ You must ALWAYS output your final response as valid JSON matching this exact str
     "bankruptcy_probability": <float>
   }},
   "risk_drivers": [
-    "<string description of driver 1>",
-    "<string description of driver 2>"
+    "<detailed, descriptive, paragraph-length analysis of risk driver 1>",
+    "<detailed, descriptive, paragraph-length analysis of risk driver 2>"
   ],
   "recommended_strategy": [
-    "<string step 1>",
-    "<string step 2>"
+    "<Phase 1 (Timeline): detailed, descriptive, paragraph-length strategic recovery action with clear immediate recommendations>",
+    "<Phase 2 (Timeline): detailed, descriptive, paragraph-length strategic recovery action focusing on medium-term stability>",
+    "<Phase 3 (Timeline): detailed, descriptive, paragraph-length strategic recovery action focusing on long-term growth>"
   ],
   "projected_risk_after_strategy": <float or null>
 }}
+
+CRITICAL INSTRUCTION: For `risk_drivers` and `recommended_strategy`, DO NOT just output short 4-5 word bullet points. You MUST write in a highly descriptive, analytical, and detailed manner. Each item MUST be a full, robust paragraph explaining the 'why', the 'how', and the expected impact.
+For `recommended_strategy`, you MUST explicitly structure it as a chronological, phase-wise improvement plan (e.g., Phase 1: 0-3 Months, Phase 2: 3-6 Months). Provide deep, actionable recommendations for each phase.
 
 Note: If risk is < 20, `risk_drivers` and `recommended_strategy` can be empty arrays or contain a note about being healthy.
 If `run_rl_strategy` was called, summarize the steps returned in `recommended_strategy` and provide `final_risk` in `projected_risk_after_strategy`.
@@ -79,18 +82,18 @@ If `run_rl_strategy` was called, summarize the steps returned in `recommended_st
 
 class FinancialRiskAgent:
     def __init__(self):
-        # We assume OPENAI_API_KEY is properly set in the environment.
-        # Fallback to a placeholder if not set to prevent immediate import crash
-        api_key = os.environ.get("OPENAI_API_KEY", "dummy_key")
-        self.llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0, api_key=api_key)
+        # Force-override the environment variable to use the fresh API key provided by the user
+        os.environ["GROQ_API_KEY"] = "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"
+        api_key = os.environ["GROQ_API_KEY"]
+        self.llm = ChatOpenAI(base_url="https://api.groq.com/openai/v1", model="llama-3.3-70b-versatile", temperature=0, api_key=api_key)
         self.tools = [predict_bankruptcy_risk, generate_shap_explanation, run_rl_strategy]
         self.agent = create_tool_calling_agent(self.llm, self.tools, agent_prompt)
         self.agent_executor = AgentExecutor(agent=self.agent, tools=self.tools, verbose=True)
         
     async def analyze_company(self, financial_vector: List[float]) -> dict:
-        if os.environ.get("OPENAI_API_KEY") is None or os.environ.get("OPENAI_API_KEY") == "dummy_key":
+        if os.environ.get("GROQ_API_KEY") is None or os.environ.get("GROQ_API_KEY") == "dummy_key":
             return {
-                "error": "OPENAI_API_KEY is not set. Please set the environment variable to use the AI Advisor."
+                "error": "GROQ_API_KEY is not set. Please set the environment variable to use the AI Advisor."
             }
             
         try:

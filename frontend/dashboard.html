@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Risk Dashboard - FinRisk AI</title>
+    <title>Risk Dashboard - FEC Risk AI</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -12,8 +12,8 @@
 <body>
     <nav class="navbar">
         <div class="logo">
-            <i class="fa-solid fa-building-columns"></i>
-            <span>FinRisk AI</span>
+            <img src="fec_logo.png" alt="FEC Logo" style="height: 36px; width: auto; border-radius: 4px;">
+            <span>FEC Risk AI</span>
         </div>
         <div class="nav-links">
             <a href="index.html">New Analysis</a>
@@ -25,82 +25,167 @@
         
         <!-- SECTION 1: Risk Summary -->
         <section class="glass-panel card risk-summary-card">
-            <h2>Risk Summary</h2>
+            <h2><i class="fa-solid fa-chart-pie"></i> Risk Overview</h2>
             <div class="risk-score-wrapper">
                 <div class="risk-circle" id="risk-circle">
                     <span class="score-value" id="risk-score-val">--</span>
                     <span class="score-label">Risk Score</span>
                 </div>
-                <div class="risk-details">
-                    <h3 id="risk-category-name" class="risk-category">--</h3>
-                    <p>Bankruptcy Probability: <strong id="risk-probability-val">--%</strong></p>
-                    <div class="risk-bar-bg">
-                        <div class="risk-bar-fill" id="risk-bar-fill"></div>
+                <div class="risk-details" style="margin-top: 2rem;">
+                    <h3 id="risk-category-name" class="risk-category" style="color:var(--color-primary); font-size:1.8rem; font-family:'Oswald', sans-serif;">--</h3>
+                    <p style="text-transform:uppercase; letter-spacing:1px; margin-top:0.5rem; font-size:0.9rem;">Bankruptcy Prob: <strong id="risk-probability-val">--%</strong></p>
+                    <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-top: 1rem; overflow: hidden;">
+                        <div id="risk-bar-fill" style="height: 100%; width: 0%; transition: width 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);"></div>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- SECTION 2: SHAP Explanation -->
-        <section class="glass-panel card shap-card">
-            <h2><i class="fa-solid fa-scale-balanced"></i> Key Financial Drivers</h2>
-            <div class="chart-container" style="margin-bottom: 2rem;">
-                <canvas id="shap-chart"></canvas>
-            </div>
-            
-            <div id="shap-summary-container" class="rl-summary-card glass-panel" style="padding: 1.5rem; background: rgba(33, 38, 45, 0.4);">
-                <h3 style="margin-bottom: 0.5rem; color: #58a6ff;"><i class="fa-solid fa-bolt"></i> Driver Analysis</h3>
-                <p id="shap-summary-text" style="color: #c9d1d9; font-size: 0.95rem; line-height: 1.5;"></p>
+        <section class="glass-panel card shap-card span-2">
+            <h2><i class="fa-solid fa-microscope"></i> Feature Attribution Analysis</h2>
+            <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 2rem;">
+                <div class="chart-container">
+                    <canvas id="shap-chart"></canvas>
+                </div>
+                <div id="shap-summary-container" style="padding: 1.5rem; background: rgba(0,0,0,0.3); border-radius: 16px; border: 1px solid rgba(255,255,255,0.05);">
+                    <h3 style="margin-bottom: 0.8rem; color: var(--color-primary); font-size: 1.1rem;"><i class="fa-solid fa-bolt"></i> Key Financial Drivers</h3>
+                    <p id="shap-summary-text" style="color: #a1a1aa; font-size: 0.95rem; line-height: 1.6;"></p>
+                </div>
             </div>
         </section>
 
         <!-- SECTION 3: RL Strategy Optimizer -->
         <section class="glass-panel card rl-strategy-card span-2">
-            <div class="card-header">
-                <h2><i class="fa-solid fa-robot"></i> AI Recommended Financial Strategy</h2>
-                <button id="run-rl-btn" class="btn btn-action">
-                    <i class="fa-solid fa-play"></i> Run Simulation
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem;">
+                <h2 style="margin:0;"><i class="fa-solid fa-network-wired"></i> Neural RL Optimization</h2>
+                <button id="run-rl-btn" class="btn btn-primary">
+                    <i class="fa-solid fa-rocket"></i> Run Deep Simulation
                 </button>
             </div>
             
-            <div id="rl-results" class="rl-results-container" style="display: none;">
-                <div class="rl-stats">
-                    <div class="stat-box">
-                        <span class="stat-label">Initial Risk</span>
-                        <span class="stat-value text-red" id="rl-initial-risk">--%</span>
+            <div id="rl-results" style="display: none;">
+                <div class="advisor-stat-grid" style="grid-template-columns: repeat(3, 1fr);">
+                    <div class="advisor-stat-card">
+                        <span style="display:block; font-size:0.8rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:0.5rem;">Initial Risk</span>
+                        <span style="font-size: 2rem; font-weight:700; color:var(--risk-crit);" id="rl-initial-risk">--%</span>
                     </div>
-                    <div class="stat-box">
-                        <span class="stat-label">Projected Final Risk</span>
-                        <span class="stat-value text-green" id="rl-final-risk">--%</span>
+                    <div class="advisor-stat-card">
+                        <span style="display:block; font-size:0.8rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:0.5rem;">Projected Final Risk</span>
+                        <span style="font-size: 2rem; font-weight:700; color:var(--risk-safe);" id="rl-final-risk">--%</span>
                     </div>
-                    <div class="stat-box">
-                        <span class="stat-label" id="rl-reduction-label">Risk Reduction</span>
-                        <span class="stat-value" id="rl-reduction">--%</span>
+                    <div class="advisor-stat-card" style="background: rgba(16,185,129,0.05); border-color: rgba(16,185,129,0.2);">
+                        <span style="display:block; font-size:0.8rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:0.5rem;" id="rl-reduction-label">Risk Reduction</span>
+                        <span style="font-size: 2.2rem; font-weight:700; color:var(--color-primary); text-shadow: 0 0 15px rgba(16,185,129,0.4);" id="rl-reduction">--%</span>
                     </div>
                 </div>
                 
-                <div class="rl-content-grid">
-                    <div class="rl-steps">
-                        <h3><i class="fa-solid fa-map"></i> Recommended 10-Quarter Strategy</h3>
-                        <div id="rl-strategy-paragraph" class="strategy-paragraph" style="margin-top: 1rem; color: #c9d1d9; font-size: 0.95rem; line-height: 1.6;">
-                            <!-- Paragraph will be populated here -->
-                        </div>
+                <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 2rem; margin-top: 2rem;">
+                    <div style="background: rgba(0,0,0,0.3); border-radius: 16px; padding: 1.5rem; border: 1px solid rgba(255,255,255,0.05);">
+                        <h3 style="font-size:1.1rem; margin-bottom:1rem; color:var(--color-secondary);"><i class="fa-solid fa-layer-group"></i> 10-Quarter Quantum Output</h3>
+                        <div id="rl-strategy-paragraph" style="color:#a1a1aa; font-size:0.95rem; line-height:1.7;"></div>
                     </div>
                     <div class="rl-chart-wrapper">
-                        <h3>Projected Risk Trajectory</h3>
                         <canvas id="rl-chart"></canvas>
                     </div>
                 </div>
             
-            <div id="rl-summary-container" class="rl-summary-card glass-panel" style="display: none; margin-top: 1.5rem; padding: 1.5rem;">
-                <h3 style="margin-bottom: 0.5rem; color: #58a6ff;"><i class="fa-solid fa-lightbulb"></i> Strategy Summary</h3>
-                <p id="rl-summary-text" style="color: #c9d1d9; font-size: 0.95rem;"></p>
+                <div id="rl-summary-container" style="display: none; margin-top: 1.5rem; padding: 1.5rem; border-radius: 16px; background: linear-gradient(90deg, rgba(16,185,129,0.1), rgba(14,165,233,0.1)); border: 1px solid rgba(16,185,129,0.2);">
+                    <h3 style="margin-bottom: 0.5rem; color:#fff;"><i class="fa-solid fa-lightbulb" style="color:var(--color-primary)"></i> Strategic Alpha</h3>
+                    <p id="rl-summary-text" style="color:#e0e0e0; font-size:0.95rem; line-height:1.6;"></p>
+                </div>
             </div>
             
-            <div id="rl-loading" class="rl-loading" style="display: none;">
-                <i class="fa-solid fa-robot fa-bounce"></i>
-                <p>AI Agent is simulating financial adjustment strategies...</p>
-                <small>Training PPO policy on current financial state (may take 10-15s)</small>
+            <div id="rl-loading" style="display: none; text-align: center; padding: 4rem 2rem;">
+                <i class="fa-solid fa-circle-nodes fa-spin" style="font-size:3rem; color:var(--color-secondary); margin-bottom:1.5rem;"></i>
+                <p style="font-size:1.2rem; color:#fff; margin-bottom:0.5rem;">Training PPO Neural Nodes...</p>
+                <p style="color:var(--text-muted); font-size:0.9rem;">Executing 10k simulations over financial timeline.</p>
+            </div>
+        </section>
+        
+        <!-- SECTION 4: AI Financial Advisor -->
+        <section class="glass-panel card ai-advisor-card span-2" style="position: relative;">
+            
+            <!-- Glow Accent Line -->
+            <div style="position:absolute; top:0; left:0; width:100%; height:4px; background:linear-gradient(90deg, var(--color-primary), var(--color-secondary));"></div>
+
+            <div style="display: flex; justify-content: space-between; width: 100%; align-items: flex-end; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem;">
+                <div>
+                    <h2 style="margin:0; font-size: 2.5rem; letter-spacing: 0px;"><i class="fa-solid fa-microchip" style="color: var(--color-primary); background: transparent; padding: 0; box-shadow: none;"></i> AGENTIC AI CORE</h2>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 0.5rem;">Autonomous LLaMA-3 Agent Orchestrator</p>
+                </div>
+                <button id="run-advisor-btn" class="btn btn-primary" style="background: transparent; border: 1px solid var(--color-primary); color: var(--color-primary); box-shadow: 0 0 15px rgba(16,185,129,0.2);">
+                    <i class="fa-solid fa-bolt"></i>&nbsp; RUN AUTONOMOUS ANALYSIS
+                </button>
+            </div>
+
+            <div id="advisor-loading" style="display: none; padding: 5rem 2rem; text-align: center;">
+                <div style="font-size: 4rem; margin-bottom: 1.5rem; filter: drop-shadow(0 0 20px rgba(16,185,129,0.8));">
+                    <i class="fa-solid fa-brain fa-fade" style="color: var(--color-primary);"></i>
+                </div>
+                <h3 style="color: #fff; font-size: 1.5rem; font-family: 'Oswald', sans-serif; letter-spacing: 1px; margin-bottom: 0.5rem;">AGENT MULTIPLEXING INITIATED</h3>
+                <p style="color: var(--text-muted); max-width: 400px; margin: 0 auto; line-height: 1.6;">Calling predictive ML models, SHAP explainer tools, and Reinforcement Learning simulations across parallel threads...</p>
+            </div>
+
+            <div id="advisor-results" style="display: none;">
+                <!-- Result Banner -->
+                <div id="advisor-banner" style="border-radius: 16px; margin-bottom: 2rem; padding: 1.5rem 2.5rem; display: flex; align-items: center; gap: 1.5rem; background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); box-shadow: inset 0 0 20px rgba(16,185,129,0.05);">
+                    <div id="advisor-banner-icon" style="font-size: 2.5rem;"></div>
+                    <div style="flex: 1;">
+                        <div id="advisor-banner-title" style="font-size: 1.3rem; font-weight: 700; color: #fff; letter-spacing: 0.5px;"></div>
+                        <div id="advisor-banner-subtitle" style="font-size: 0.9rem; color: #a1a1aa; margin-top: 0.3rem;"></div>
+                    </div>
+                    <div style="text-align: right; background: rgba(0,0,0,0.3); padding: 0.8rem 1.5rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                        <div style="font-size: 0.75rem; color: #a1a1aa; margin-bottom: 0.3rem; text-transform: uppercase;">Confidence Score</div>
+                        <div id="advisor-confidence" style="font-size: 1.3rem; font-weight: 700; color: var(--color-primary);">High</div>
+                    </div>
+                </div>
+
+                <!-- 4 Metrics -->
+                <div class="advisor-stat-grid">
+                    <div class="advisor-stat-card">
+                        <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.8rem;">Risk Category</div>
+                        <div id="advisor-risk-category" style="font-size: 1.6rem; font-weight: 700; color: #fff;">—</div>
+                    </div>
+                    <div class="advisor-stat-card">
+                        <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.8rem;">Risk Score</div>
+                        <div id="advisor-risk-score" style="font-size: 1.6rem; font-weight: 700; color: #fff;">—</div>
+                    </div>
+                    <div class="advisor-stat-card">
+                        <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.8rem;">Bankruptcy Prob</div>
+                        <div id="advisor-bankruptcy-prob" style="font-size: 1.6rem; font-weight: 700; color: #fff;">—</div>
+                    </div>
+                    <div class="advisor-stat-card" style="box-shadow: inset 0 0 15px rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.2);">
+                        <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.8rem;">Projected Post-Strategy</div>
+                        <div id="advisor-projected-risk" style="font-size: 1.8rem; font-weight: 700; color: var(--color-primary); text-shadow: 0 0 10px rgba(16,185,129,0.4);">—</div>
+                    </div>
+                </div>
+
+                <!-- Deep Analysis Grid -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; margin-top: 3rem;">
+                    <!-- Left: Drivers -->
+                    <div>
+                        <h3 style="font-size: 1.2rem; text-transform: uppercase; letter-spacing: 1px; color: #ef4444; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.8rem;">
+                            <span style="background: rgba(239,68,68,0.15); padding: 0.5rem; border-radius: 8px;"><i class="fa-solid fa-triangle-exclamation"></i></span> Risk Mechanics Detected
+                        </h3>
+                        <div id="advisor-drivers-list" style="display: flex; flex-direction: column; gap: 1rem;"></div>
+                    </div>
+                    <!-- Right: Strategy -->
+                    <div>
+                        <h3 style="font-size: 1.2rem; text-transform: uppercase; letter-spacing: 1px; color: var(--color-primary); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.8rem;">
+                            <span style="background: rgba(16,185,129,0.15); padding: 0.5rem; border-radius: 8px;"><i class="fa-solid fa-layer-group"></i></span> Master Recovery Plan
+                        </h3>
+                        <div id="advisor-strategy-list" style="display: flex; flex-direction: column; gap: 1rem;"></div>
+                    </div>
+                </div>
+
+                <!-- Logic Log -->
+                <div style="margin-top: 3rem; padding: 1.5rem; background: rgba(0,0,0,0.5); border-radius: 16px; border: 1px solid rgba(255,255,255,0.05);">
+                    <div style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;" onclick="document.getElementById('advisor-log').style.display = document.getElementById('advisor-log').style.display === 'none' ? 'block' : 'none'">
+                        <span style="font-size: 0.85rem; color: #a1a1aa; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600;"><i class="fa-solid fa-terminal" style="color: var(--color-secondary);"></i>&nbsp; Kernel Execution Log</span>
+                    </div>
+                    <div id="advisor-log" style="display: none; margin-top: 1.5rem; font-family: 'Consolas', monospace; font-size: 0.85rem; color: #34d399; line-height: 2; white-space: pre-wrap; padding: 1.5rem; background: #000; border-radius: 8px; box-shadow: inset 0 0 15px rgba(0,0,0,1);"></div>
+                </div>
             </div>
         </section>
         
@@ -110,8 +195,8 @@
         <div class="spinner">
             <i class="fa-solid fa-circle-notch fa-spin"></i>
         </div>
-        <h2>Analyzing Financial Data...</h2>
-        <p>Running XGBoost predictions & computing SHAP explanations</p>
+        <h2 style="font-family:'Oswald', sans-serif; font-size:2.5rem; letter-spacing:2px;">INITIATING CORE</h2>
+        <p style="color:var(--color-primary); margin-top:1rem; letter-spacing:1px; text-transform:uppercase;">Decentralized Risk Engine Loading...</p>
     </div>
 
     <script src="app.js"></script>

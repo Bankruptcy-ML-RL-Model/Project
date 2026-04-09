@@ -3,49 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Financial Risk Intelligence Platform</title>
+    <title>FEC Risk AI</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <nav class="navbar">
         <div class="logo">
-            <i class="fa-solid fa-building-columns"></i>
-            <span>FinRisk AI</span>
+            <img src="fec_logo.png" alt="FEC Logo" style="height: 36px;">
+            <span>FEC Risk AI</span>
         </div>
         <div class="nav-links">
             <a href="index.html" class="active">New Analysis</a>
-            <a href="#">History</a>
-            <a href="#">Settings</a>
+            <a href="dashboard.html">Dashboard Dashboard</a>
         </div>
     </nav>
 
     <main class="container">
         <header class="page-header">
-            <h1>Corporate Bankruptcy Risk Simulator</h1>
-            <p>Enter the company's financial indicators to receive a comprehensive risk analysis, SHAP interpretation, and AI-driven reduction strategy.</p>
+            <h1>CORPORATE BANKRUPTCY ENGINE</h1>
+            <p>Input financial telemetry below to trigger deep Reinforcement Learning simulations, SHAP attributions, and LLaMA-based autonomous intelligence generation.</p>
         </header>
 
-        <section class="form-card glass-panel">
-            <div class="form-header">
-                <h2>Financial Indicators</h2>
-                <button type="button" id="fill-sample-btn" class="btn btn-secondary">
-                    <i class="fa-solid fa-wand-magic-sparkles"></i> Fill Demo Data
+        <section class="glass-panel" style="max-width: 1000px; margin: 0 auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 1.5rem;">
+                <h2 style="font-family:'Oswald', sans-serif; font-size:1.8rem; letter-spacing:1px; margin:0;"><i class="fa-solid fa-server" style="color:var(--color-primary)"></i> Input Node</h2>
+                <button type="button" id="fill-sample-btn" class="btn btn-action">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Inject Demo Parameters
                 </button>
             </div>
             
             <form id="financial-form">
-                <div id="features-grid" class="features-grid">
+                <div id="features-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1.5rem;">
                     <!-- Dynamic form fields will be injected here via JS -->
-                    <div class="loading-spinner">
-                        <i class="fa-solid fa-circle-notch fa-spin"></i> Loading financial indicators...
+                    <div style="grid-column: 1/-1; text-align: center; padding: 4rem 0;">
+                        <i class="fa-solid fa-circle-notch fa-spin" style="font-size:2.5rem; color:var(--color-primary); margin-bottom:1rem;"></i>
+                        <div style="color:var(--text-muted); font-size:0.95rem;">Mounting Input Matrix...</div>
                     </div>
                 </div>
                 
-                <div class="form-actions">
-                    <button type="submit" id="analyze-btn" class="btn btn-primary btn-large">
-                        <i class="fa-solid fa-microchip"></i> Analyze Company Risk
+                <div style="margin-top: 4rem; text-align: center;">
+                    <button type="submit" id="analyze-btn" class="btn btn-primary" style="font-size: 1.2rem; padding: 1.2rem 4rem; letter-spacing: 2px;">
+                        <i class="fa-solid fa-bolt"></i> SYNTHESIZE DATA
                     </button>
                 </div>
             </form>
@@ -54,7 +54,6 @@
 
     <script src="app.js"></script>
     <script>
-        // Init index page functionality
         document.addEventListener('DOMContentLoaded', () => {
             app.initIndexPage();
         });

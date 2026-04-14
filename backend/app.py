@@ -8,6 +8,7 @@ from backend.prediction_api import router as prediction_router
 from backend.shap_api import router as shap_router
 from backend.rl_api import router as rl_router
 from backend.advisor_api import router as advisor_router
+from backend.upload_api import router as upload_router
 
 # Initialize the frontend path
 FRONTEND_DIR = os.path.join(BASE_DIR, "frontend")
@@ -32,6 +33,7 @@ app.include_router(prediction_router, prefix="/api")
 app.include_router(shap_router, prefix="/api")
 app.include_router(rl_router, prefix="/api")
 app.include_router(advisor_router, prefix="/api")
+app.include_router(upload_router, prefix="/api")
 
 # Ensure frontend directory exists
 os.makedirs(FRONTEND_DIR, exist_ok=True)

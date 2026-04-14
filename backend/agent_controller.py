@@ -3,8 +3,7 @@ import json
 import re
 from typing import List, Dict, Any
 from langchain_openai import ChatOpenAI
-from langchain.agents import AgentExecutor, create_tool_calling_agent
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langgraph.prebuilt import create_react_agent
 from langchain_core.tools import tool
 
 from backend.prediction_api import predict_bankruptcy, PredictionRequest
@@ -41,8 +40,7 @@ async def run_rl_strategy(financial_vector: List[float]) -> dict:
     res = await generate_strategy(StratRequest(features=financial_vector))
     return res
 
-agent_prompt = ChatPromptTemplate.from_messages([
-    ("system", '''You are an autonomous Financial Risk Advisory Agent. Your goal is to take a company's financial data and produce a complete financial risk advisory report in structured JSON format.
+SYSTEM_PROMPT = '''You are an autonomous Financial Risk Advisory Agent. Your goal is to take a company's financial data and produce a complete financial risk advisory report in structured JSON format.
 
 You MUST follow this exact reasoning flow:
 Step 1: Call `predict_bankruptcy_risk` using the provided financial vector.
@@ -75,10 +73,7 @@ For `recommended_strategy`, you MUST explicitly structure it as a chronological,
 
 Note: If risk is < 20, `risk_drivers` and `recommended_strategy` can be empty arrays or contain a note about being healthy.
 If `run_rl_strategy` was called, summarize the steps returned in `recommended_strategy` and provide `final_risk` in `projected_risk_after_strategy`.
-'''),
-    ("human", "{input}"),
-    MessagesPlaceholder("agent_scratchpad"),
-])
+'''
 
 class FinancialRiskAgent:
     def __init__(self):
@@ -88,8 +83,7 @@ class FinancialRiskAgent:
             print("WARNING: GROQ_API_KEY not found in environment variables.")
         self.llm = ChatOpenAI(base_url="https://api.groq.com/openai/v1", model="llama-3.3-70b-versatile", temperature=0, api_key=api_key)
         self.tools = [predict_bankruptcy_risk, generate_shap_explanation, run_rl_strategy]
-        self.agent = create_tool_calling_agent(self.llm, self.tools, agent_prompt)
-        self.agent_executor = AgentExecutor(agent=self.agent, tools=self.tools, verbose=True)
+        self.agent = create_react_agent(self.llm, self.tools, prompt=SYSTEM_PROMPT)
         
     async def analyze_company(self, financial_vector: List[float]) -> dict:
         if os.environ.get("GROQ_API_KEY") is None or os.environ.get("GROQ_API_KEY") == "dummy_key":
@@ -98,17 +92,65 @@ class FinancialRiskAgent:
             }
             
         try:
-            result = await self.agent_executor.ainvoke({"input": f"Analyze this financial vector: {financial_vector}"})
+            result = await self.agent.ainvoke({"messages": [("human", f"Analyze this financial vector: {financial_vector}")]})
             
-            # Extract JSON from output
-            output_text = result["output"]
-            match = re.search(r'\{.*\}', output_text, re.DOTALL)
-            if match:
-                output_text = match.group(0)
-                
-            return json.loads(output_text)
+            # Extract the final AI message content
+            output_text = result["messages"][-1].content
+            parsed = self._parse_llm_json(output_text)
+            return parsed
         except Exception as e:
             return {
                 "error": str(e),
-                "raw_output": result.get("output", "") if 'result' in locals() else ""
+                "raw_output": result["messages"][-1].content if 'result' in locals() else ""
             }
+
+    @staticmethod
+    def _parse_llm_json(text: str) -> dict:
+        """Robustly parse JSON from LLM output, handling common malformations."""
+        # Strip markdown code fences
+        text = re.sub(r"```json\s*", "", text)
+        text = re.sub(r"```\s*", "", text)
+        text = text.strip()
+
+        # Normalize double curly braces (LLM mimics the prompt template)
+        text = text.replace("{{", "{").replace("}}", "}")
+
+        # Try direct parse first
+        try:
+            return json.loads(text)
+        except json.JSONDecodeError:
+            pass
+
+        # Try to extract JSON object with regex
+        match = re.search(r'\{.*\}', text, re.DOTALL)
+        if match:
+            candidate = match.group(0)
+            try:
+                return json.loads(candidate)
+            except json.JSONDecodeError:
+                pass
+
+            # Fix common issues: single quotes → double quotes
+            fixed = candidate
+            # Replace single-quoted keys/values with double-quoted ones
+            fixed = re.sub(r"'([^']*?)'(\s*:)", r'"\1"\2', fixed)  # keys
+            fixed = re.sub(r":\s*'([^']*?)'", r': "\1"', fixed)    # values
+            # Remove trailing commas before } or ]
+            fixed = re.sub(r",\s*([}\]])", r"\1", fixed)
+            try:
+                return json.loads(fixed)
+            except json.JSONDecodeError:
+                pass
+
+        # Last resort: build a minimal valid response from the raw text
+        return {
+            "company_risk_assessment": {
+                "risk_score": 0,
+                "risk_category": "Unknown",
+                "bankruptcy_probability": 0
+            },
+            "risk_drivers": [text[:500] if text else "Could not parse AI response"],
+            "recommended_strategy": ["Please try again or use the manual analysis tools."],
+            "projected_risk_after_strategy": None
+        }
+

@@ -14,9 +14,177 @@ const app = {
     },
 
     // ──────────────────────────────────────────────────────────
+    // TAB SWITCHING
+    // ──────────────────────────────────────────────────────────
+    switchTab: (tab) => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+
+        if (tab === 'upload') {
+            document.getElementById('tab-upload-btn').classList.add('active');
+            document.getElementById('tab-upload').style.display = 'block';
+        } else {
+            document.getElementById('tab-manual-btn').classList.add('active');
+            document.getElementById('tab-manual').style.display = 'block';
+        }
+    },
+
+    // ──────────────────────────────────────────────────────────
     // INDEX PAGE METHODS
     // ──────────────────────────────────────────────────────────
     initIndexPage: async () => {
+        // Init upload tab
+        app.initUploadTab();
+
+        // Init manual tab
+        app.initManualTab();
+    },
+
+    // ──────────────────────────────────────────────────────────
+    // UPLOAD TAB
+    // ──────────────────────────────────────────────────────────
+    uploadFiles: {},
+
+    initUploadTab: () => {
+        const fields = ['statements_current', 'statements_previous'];
+
+        fields.forEach(field => {
+            const zone = document.getElementById(`zone-${field.replace('_', '-')}`);
+            const input = document.getElementById(`file-${field.replace('_', '-')}`);
+            const fnameEl = document.getElementById(`fname-${field.replace('_', '-')}`);
+
+            if (!zone || !input) return;
+
+            // Drag events
+            zone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                zone.classList.add('drag-over');
+            });
+            zone.addEventListener('dragleave', () => {
+                zone.classList.remove('drag-over');
+            });
+            zone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                zone.classList.remove('drag-over');
+                const file = e.dataTransfer.files[0];
+                if (file && file.type === 'application/pdf') {
+                    app.uploadFiles[field] = file;
+                    zone.classList.add('has-file');
+                    fnameEl.textContent = file.name;
+                    // Sync the file input
+                    const dt = new DataTransfer();
+                    dt.items.add(file);
+                    input.files = dt.files;
+                }
+                app.updateUploadStatus();
+            });
+
+            // Click to browse
+            input.addEventListener('change', () => {
+                const file = input.files[0];
+                if (file) {
+                    app.uploadFiles[field] = file;
+                    zone.classList.add('has-file');
+                    fnameEl.textContent = file.name;
+                }
+                app.updateUploadStatus();
+            });
+        });
+
+        // Analyze button
+        const analyzeBtn = document.getElementById('upload-analyze-btn');
+        if (analyzeBtn) {
+            analyzeBtn.addEventListener('click', () => app.handleUploadSubmit());
+        }
+    },
+
+    updateUploadStatus: () => {
+        const total = 2;
+        const uploaded = Object.keys(app.uploadFiles).length;
+        const statusEl = document.getElementById('upload-status');
+        if (statusEl) {
+            if (uploaded === 0) {
+                statusEl.textContent = '';
+            } else if (uploaded < total) {
+                statusEl.innerHTML = `<i class="fa-solid fa-circle-half-stroke" style="color:var(--color-secondary)"></i> ${uploaded} of ${total} files selected`;
+            } else {
+                statusEl.innerHTML = `<i class="fa-solid fa-circle-check" style="color:var(--color-primary)"></i> All ${total} files ready — click Analyze to proceed`;
+            }
+        }
+    },
+
+    handleUploadSubmit: async () => {
+        const required = ['statements_current', 'statements_previous'];
+        const missing = required.filter(f => !app.uploadFiles[f]);
+
+        if (missing.length > 0) {
+            const labels = {
+                statements_current: 'Current Year Statements',
+                statements_previous: 'Previous Year Statements',
+            };
+            alert('Missing files:\n' + missing.map(f => '• ' + labels[f]).join('\n'));
+            return;
+        }
+
+        const btn = document.getElementById('upload-analyze-btn');
+        const section = document.getElementById('tab-upload');
+        const originalBtnHtml = btn.innerHTML;
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> EXTRACTING & ANALYZING...';
+        section.classList.add('upload-loading');
+
+        try {
+            const formData = new FormData();
+            required.forEach(field => {
+                formData.append(field, app.uploadFiles[field]);
+            });
+            const companyName = document.getElementById('company-name')?.value || 'Company';
+            formData.append('company_name', companyName);
+
+            const response = await fetch(`${API_URL}/upload`, {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                const err = await response.json();
+                let errMsg = err.detail || 'Upload failed';
+                if (Array.isArray(err.detail)) {
+                    errMsg = err.detail.map(d => `${d.loc.join('.')}: ${d.msg}`).join(', ');
+                } else if (typeof err.detail === 'string') {
+                    errMsg = err.detail;
+                } else if (typeof err.detail === 'object') {
+                    errMsg = JSON.stringify(err.detail);
+                }
+                throw new Error(errMsg);
+            }
+
+            const data = await response.json();
+
+            // Save features to localStorage and redirect to dashboard
+            localStorage.setItem('finrisk_features', JSON.stringify(data.features));
+            localStorage.setItem('finrisk_company', companyName);
+            localStorage.setItem('finrisk_upload_info', JSON.stringify({
+                items: data.items_extracted,
+                message: data.message,
+                raw_data: data.raw_data,
+            }));
+
+            window.location.href = 'dashboard.html';
+
+        } catch (error) {
+            alert('Failed to process financial statements:\n' + error.message);
+            btn.disabled = false;
+            btn.innerHTML = originalBtnHtml;
+            section.classList.remove('upload-loading');
+        }
+    },
+
+    // ──────────────────────────────────────────────────────────
+    // MANUAL INPUT TAB
+    // ──────────────────────────────────────────────────────────
+    initManualTab: async () => {
         const grid = document.getElementById('features-grid');
         const fillBtn = document.getElementById('fill-sample-btn');
         const form = document.getElementById('financial-form');
@@ -32,7 +200,6 @@ const app = {
             // Build form
             grid.innerHTML = '';
             data.forEach((feature, index) => {
-                const isRatio = feature.name.toLowerCase().includes('ratio') || feature.name.toLowerCase().includes('rate');
                 const step = "any";
                 
                 grid.innerHTML += `
@@ -46,7 +213,6 @@ const app = {
             
             // Fill realistic data on button click
             fillBtn.addEventListener('click', () => {
-                // Randomly choose to generate a "Good Company" or a "Bad Company"
                 const generateHighRisk = Math.random() > 0.5;
                 
                 data.forEach((feature, index) => {
@@ -55,21 +221,16 @@ const app = {
                     
                     let val = 0;
                     
-                    // Rules of thumb for good vs bad companies
                     if (fname.includes('debt') || fname.includes('liability') || fname.includes('borrow')) {
-                        // High debt = bad
                         val = generateHighRisk ? 0.6 + Math.random() * 0.3 : 0.05 + Math.random() * 0.15;
                     } 
                     else if (fname.includes('profit') || fname.includes('cash') || fname.includes('income') || fname.includes('roa') || fname.includes('roe')) {
-                        // High profit/cash = good
                         val = generateHighRisk ? 0.0 + Math.random() * 0.1 : 0.6 + Math.random() * 0.3;
                     }
                     else if (fname.includes('growth')) {
-                        // High growth = good
                         val = generateHighRisk ? Math.random() * 0.1 : 0.4 + Math.random() * 0.5;
                     }
                     else {
-                        // Random noise for neutral features
                         const span = feature.adjustment_range[1] - feature.adjustment_range[0];
                         val = feature.adjustment_range[0] + (Math.random() * span);
                         val = Math.abs(val);
@@ -78,7 +239,6 @@ const app = {
                     el.value = val.toFixed(4);
                 });
                 
-                // Show a quick toast notification
                 const type = generateHighRisk ? "Distressed/High-Risk" : "Healthy/Low-Risk";
                 const btnOriginal = fillBtn.innerHTML;
                 fillBtn.innerHTML = `<i class="fa-solid fa-check"></i> Filled ${type} Data`;
@@ -91,7 +251,6 @@ const app = {
                 let isValid = true;
                 const features = [];
                 
-                // Clear previous messages
                 document.querySelectorAll('.validation-msg').forEach(el => el.textContent = '');
                 
                 for (let i = 0; i < data.length; i++) {
@@ -110,7 +269,6 @@ const app = {
                     return;
                 }
                 
-                // Save to local storage and redirect
                 localStorage.setItem('finrisk_features', JSON.stringify(features));
                 window.location.href = 'dashboard.html';
             });
@@ -156,7 +314,7 @@ const app = {
             
             // Setup Dashboard View
             document.getElementById('loading-overlay').style.display = 'none';
-            dashboard.style.display = 'grid'; // .layout-dashboard uses grid
+            dashboard.style.display = 'grid';
             
             app.renderRiskSummary(predData);
             app.renderShapChart(shapData, predData.risk_score);
@@ -185,12 +343,10 @@ const app = {
     },
 
     renderRiskSummary: (data) => {
-        // Enforce 0-100 logic explicitly
         const boundedProbability = Math.max(0, Math.min(1, data.bankruptcy_probability));
         const riskScoreNum = boundedProbability * 100;
         const score = riskScoreNum.toFixed(1);
         
-        // Use exact logic: 0-20, 20-40, 40-60, 60-80, 80-100
         let category = 'Safe';
         let color = app.colors.safe;
         
@@ -222,11 +378,9 @@ const app = {
     renderShapChart: (data, riskScore) => {
         const ctx = document.getElementById('shap-chart').getContext('2d');
         
-        // Take top 5 risk factors and top 5 protective factors
         const topRisk = data.top_risk_factors.slice(0, 5);
         const topProtective = data.top_protective_factors.slice(0, 5);
         
-        // Combine them so risk factors are at the top, protective at bottom
         const combined = [...topRisk, ...topProtective];
         
         const labels = combined.map(c => 
@@ -333,12 +487,6 @@ const app = {
                 return;
             }
             
-            // Re-show stats block just in case it was overwritten by skip_rl previously
-            if(results.innerHTML.includes('fa-shield-check')) {
-                // If the user refreshed or changed inputs without reloading the page, we'd need a clean DOM.
-                // Assuming standard reload for now, but just show block.
-            }
-            
             // Populate stats
             document.getElementById('rl-initial-risk').textContent = data.initial_risk.toFixed(1) + '%';
             document.getElementById('rl-final-risk').textContent = data.final_risk.toFixed(1) + '%';
@@ -358,6 +506,7 @@ const app = {
                 reductionValue.className = "stat-value text-red";
                 reductionValue.textContent = '+' + pct.toFixed(1) + '%';
             }
+
             // Generate Strategy Paragraph
             const paragraphContainer = document.getElementById('rl-strategy-paragraph');
             
@@ -365,8 +514,7 @@ const app = {
             let uniqueActionsInOrder = [];
             
             data.history.forEach((h, i) => {
-                if (i === 0) return; // skip initial state
-                
+                if (i === 0) return;
                 const baseAction = h.action_str;
                 actionCounts[baseAction] = (actionCounts[baseAction] || 0) + 1;
                 if (!uniqueActionsInOrder.includes(baseAction)) {
@@ -374,7 +522,6 @@ const app = {
                 }
             });
             
-            // Generate a natural language paragraph
             let paragraphHTML = "";
             
             if (uniqueActionsInOrder.length > 0) {
@@ -428,7 +575,6 @@ const app = {
             const lineColor = isImproving ? '#3fb950' : '#f85149';
             const bgColor = isImproving ? 'rgba(63, 185, 80, 0.15)' : 'rgba(248, 81, 73, 0.15)';
             
-            // Destroy existing chart if RL btn clicked twice
             if(window.rlChartInstance) window.rlChartInstance.destroy();
             
             window.rlChartInstance = new Chart(ctx, {
@@ -445,7 +591,7 @@ const app = {
                         pointRadius: 6,
                         pointHoverRadius: 8,
                         fill: true,
-                        tension: 0.4 // Smoothed curve
+                        tension: 0.4
                     }]
                 },
                 options: {
@@ -507,7 +653,6 @@ const app = {
                 throw new Error(data.error);
             }
             if (data.detail) {
-                // Catches FastAPI HTTPExceptions (like Rate Limits and server crashes)
                 throw new Error(data.detail);
             }
 
@@ -559,7 +704,7 @@ const app = {
                 projEl.style.color = '#8b949e';
             }
 
-            // ── Risk Drivers (as chips) ────────────────────────────
+            // ── Risk Drivers ────────────────────────────────────────
             const driversList = document.getElementById('advisor-drivers-list');
             driversList.innerHTML = '';
             const drivers = data.risk_drivers || [];
@@ -574,7 +719,7 @@ const app = {
                 driversList.innerHTML = '<div style="color:#8b949e; font-size:0.88rem; font-style:italic;">No significant high-risk drivers identified.</div>';
             }
 
-            // ── Strategy Steps (numbered timeline) ─────────────────
+            // ── Strategy Steps ──────────────────────────────────────
             const strategyList = document.getElementById('advisor-strategy-list');
             strategyList.innerHTML = '';
             const steps = data.recommended_strategy || [];

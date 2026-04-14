@@ -366,3 +366,172 @@ body::after {
 ::-webkit-scrollbar-track { background: var(--bg-main); }
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--color-primary); }
+
+/* ── TAB BAR ── */
+.tab-bar {
+    display: flex;
+    gap: 0.5rem;
+    background: rgba(20, 25, 35, 0.5);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 0.4rem;
+    backdrop-filter: blur(10px);
+}
+.tab-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    padding: 1rem 1.5rem;
+    border: none;
+    border-radius: 12px;
+    background: transparent;
+    color: var(--text-muted);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.tab-btn:hover {
+    color: #fff;
+    background: rgba(255,255,255,0.05);
+}
+.tab-btn.active {
+    color: #fff;
+    background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(14,165,233,0.15));
+    border: 1px solid rgba(16,185,129,0.3);
+    box-shadow: 0 4px 15px rgba(16,185,129,0.15);
+}
+.tab-badge {
+    font-size: 0.65rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 6px;
+    background: rgba(139,92,246,0.2);
+    color: var(--color-accent);
+    border: 1px solid rgba(139,92,246,0.3);
+    letter-spacing: 0.5px;
+}
+
+/* ── UPLOAD GRID ── */
+.upload-row-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+.upload-row-title i {
+    color: var(--color-primary);
+}
+.upload-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.2rem;
+}
+.upload-zone {
+    position: relative;
+    border: 2px dashed rgba(255,255,255,0.12);
+    border-radius: 16px;
+    background: rgba(0,0,0,0.25);
+    cursor: pointer;
+    transition: all 0.35s ease;
+    overflow: hidden;
+}
+.upload-zone:hover {
+    border-color: rgba(16,185,129,0.4);
+    background: rgba(16,185,129,0.03);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3), 0 0 15px rgba(16,185,129,0.08);
+}
+.upload-zone.drag-over {
+    border-color: var(--color-primary);
+    background: rgba(16,185,129,0.08);
+    box-shadow: 0 0 25px rgba(16,185,129,0.2);
+    transform: scale(1.02);
+}
+.upload-zone.has-file {
+    border-color: rgba(16,185,129,0.5);
+    border-style: solid;
+    background: rgba(16,185,129,0.05);
+}
+.upload-zone.has-file .upload-icon {
+    color: var(--color-primary);
+}
+.upload-zone.has-file .upload-hint {
+    display: none;
+}
+.upload-zone.has-file .upload-filename {
+    display: block;
+}
+.upload-zone-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    text-align: center;
+    min-height: 150px;
+}
+.upload-icon {
+    font-size: 2rem;
+    color: rgba(255,255,255,0.25);
+    margin-bottom: 0.8rem;
+    transition: color 0.3s;
+}
+.upload-label {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #fff;
+    margin-bottom: 0.4rem;
+}
+.upload-hint {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+}
+.upload-filename {
+    display: none;
+    font-size: 0.8rem;
+    color: var(--color-primary);
+    margin-top: 0.4rem;
+    word-break: break-all;
+    max-width: 180px;
+}
+.upload-input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+/* ── LOADING SHIMMER ── */
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+.upload-loading {
+    pointer-events: none;
+    opacity: 0.7;
+}
+.upload-loading .btn-primary {
+    background: linear-gradient(90deg, rgba(16,185,129,0.3) 25%, rgba(14,165,233,0.3) 50%, rgba(16,185,129,0.3) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+    .upload-grid {
+        grid-template-columns: 1fr;
+    }
+    .tab-bar {
+        flex-direction: column;
+    }
+}

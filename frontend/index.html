@@ -16,17 +16,82 @@
         </div>
         <div class="nav-links">
             <a href="index.html" class="active">New Analysis</a>
-            <a href="dashboard.html">Dashboard Dashboard</a>
+            <a href="dashboard.html">Dashboard</a>
         </div>
     </nav>
 
     <main class="container">
         <header class="page-header">
             <h1>CORPORATE BANKRUPTCY ENGINE</h1>
-            <p>Input financial telemetry below to trigger deep Reinforcement Learning simulations, SHAP attributions, and LLaMA-based autonomous intelligence generation.</p>
+            <p>Upload financial statements or input ratios directly to trigger deep Reinforcement Learning simulations, SHAP attributions, and LLaMA-based autonomous intelligence generation.</p>
         </header>
 
-        <section class="glass-panel" style="max-width: 1000px; margin: 0 auto;">
+        <!-- ── Tab Bar ── -->
+        <div class="tab-bar" style="max-width: 1000px; margin: 0 auto 2rem;">
+            <button class="tab-btn active" id="tab-upload-btn" onclick="app.switchTab('upload')">
+                <i class="fa-solid fa-file-pdf"></i> Upload Statements
+            </button>
+            <button class="tab-btn" id="tab-manual-btn" onclick="app.switchTab('manual')">
+                <i class="fa-solid fa-keyboard"></i> Manual Input <span class="tab-badge">Advanced</span>
+            </button>
+        </div>
+
+        <!-- ════════════════════════════════════════════════ -->
+        <!-- TAB 1: PDF Upload                               -->
+        <!-- ════════════════════════════════════════════════ -->
+        <section class="glass-panel tab-content active" id="tab-upload" style="max-width: 1000px; margin: 0 auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 1.5rem;">
+                <h2 style="font-family:'Oswald', sans-serif; font-size:1.8rem; letter-spacing:1px; margin:0;">
+                    <i class="fa-solid fa-cloud-arrow-up" style="color:var(--color-primary)"></i> Upload Financial Statements
+                </h2>
+            </div>
+
+            <!-- Company Name -->
+            <div class="input-group" style="max-width: 400px; margin-bottom: 2.5rem;">
+                <label style="display:block; margin-bottom:0.5rem; color:var(--text-muted); font-size:0.85rem; text-transform:uppercase; letter-spacing:1px;">Company Name</label>
+                <input type="text" id="company-name" placeholder="Enter company name" value="Company" style="width:100%;">
+            </div>
+
+            <!-- Statements Grid -->
+            <div class="upload-grid" style="grid-template-columns: repeat(2, 1fr); max-width: 800px; margin: 0 auto;">
+                <!-- Current Year Zone -->
+                <div class="upload-zone" id="zone-statements-current" data-field="statements_current">
+                    <div class="upload-zone-inner">
+                        <i class="fa-solid fa-file-invoice-dollar upload-icon"></i>
+                        <span class="upload-label">Current Year Statements</span>
+                        <span class="upload-hint">Upload PDF containing Balance Sheet, P&L, and Cash Flow</span>
+                        <span class="upload-filename" id="fname-statements-current"></span>
+                    </div>
+                    <input type="file" accept=".pdf" class="upload-input" id="file-statements-current">
+                </div>
+
+                <!-- Previous Year Zone -->
+                <div class="upload-zone" id="zone-statements-previous" data-field="statements_previous">
+                    <div class="upload-zone-inner">
+                        <i class="fa-solid fa-clock-rotate-left upload-icon"></i>
+                        <span class="upload-label">Previous Year Statements</span>
+                        <span class="upload-hint">Upload PDF containing Balance Sheet, P&L, and Cash Flow</span>
+                        <span class="upload-filename" id="fname-statements-previous"></span>
+                    </div>
+                    <input type="file" accept=".pdf" class="upload-input" id="file-statements-previous">
+                </div>
+            </div>
+
+            <!-- Upload Status -->
+            <div id="upload-status" style="margin-top: 1.5rem; text-align: center; color: var(--text-muted); font-size: 0.9rem;"></div>
+
+            <!-- Submit -->
+            <div style="margin-top: 3rem; text-align: center;">
+                <button type="button" id="upload-analyze-btn" class="btn btn-primary" style="font-size: 1.2rem; padding: 1.2rem 4rem; letter-spacing: 2px;">
+                    <i class="fa-solid fa-bolt"></i> ANALYZE STATEMENTS
+                </button>
+            </div>
+        </section>
+
+        <!-- ════════════════════════════════════════════════ -->
+        <!-- TAB 2: Manual Input (Advanced)                  -->
+        <!-- ════════════════════════════════════════════════ -->
+        <section class="glass-panel tab-content" id="tab-manual" style="max-width: 1000px; margin: 0 auto; display: none;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 1.5rem;">
                 <h2 style="font-family:'Oswald', sans-serif; font-size:1.8rem; letter-spacing:1px; margin:0;"><i class="fa-solid fa-server" style="color:var(--color-primary)"></i> Input Node</h2>
                 <button type="button" id="fill-sample-btn" class="btn btn-action">
@@ -36,7 +101,6 @@
             
             <form id="financial-form">
                 <div id="features-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1.5rem;">
-                    <!-- Dynamic form fields will be injected here via JS -->
                     <div style="grid-column: 1/-1; text-align: center; padding: 4rem 0;">
                         <i class="fa-solid fa-circle-notch fa-spin" style="font-size:2.5rem; color:var(--color-primary); margin-bottom:1rem;"></i>
                         <div style="color:var(--text-muted); font-size:0.95rem;">Mounting Input Matrix...</div>

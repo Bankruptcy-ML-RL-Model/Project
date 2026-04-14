@@ -21,6 +21,10 @@ fastapi>=0.109.0
 uvicorn[standard]>=0.27.0
 
 # ── Agentic AI (LangChain + Groq LLM) ──
-langchain==0.1.20
-langchain-openai==0.1.25
+langchain>=0.3.0
+langchain-openai>=0.3.0
 
+# ── PDF Extraction ──
+pdfplumber>=0.10.0
+PyMuPDF>=1.23.0
+python-multipart>=0.0.6
